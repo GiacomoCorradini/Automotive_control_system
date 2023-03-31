@@ -20,20 +20,20 @@ frame_skip = 20;
 %% Parameter definition
 %-------------------------------------------------------------------------------
 
-% Longitudinal slip rangeNm
+% Longitudinal slip range
 lambda = linspace( 0, 1, 100 ); % [-] lambda vector
 
 % Vehicle parameters
-auxdata.g   = 9.81;  % [m/s^2]  Gravitational aceeleration
-auxdata.r_w = 0.3;   % [m]      Wheel radius
-auxdata.m   = 225;   % [kg]     Single corner mass
-auxdata.J   = 1;     % [kg m^2] Wheel inertia
 tau_delay   = 10e-3; % [ms]     Delay of the actuation system (caliper)
 omega_act   = 70;    % [rad/s]  Bandwidth of the actuation system (caliper)
 omega_LPF   = 100;   % [rad/s]  Bandwidth of the LowPass filter
+auxdata.r_w = 0.3;   % [m]      Wheel radius
+auxdata.m   = 225;   % [kg]     Single corner mass
 v_length    = 4.387; % [m]      Vehicle length
 width       = 1.768; % [m]      Vehicle width
+auxdata.g   = 9.81;  % [m/s^2]  Gravitational aceeleration
 m_wheel     = 5;     % [kg]     Wheel mass
+auxdata.J   = 1;     % [kg m^2] Wheel inertia
 init_speed  = 100;   % [km/h]   Initial vehicle speed
 
 % Select road condition for the simulation:
@@ -51,28 +51,43 @@ auxdata.road_condition = 1;
 fprintf( 'Road condition: %s.\n', ...
          road_condition_names{ auxdata.road_condition } );
 
-% Maximum braking torque
-Tb_max = 1500; % [Nm]
-
 % Braking torque rate
 k = 5e3; % [Nm/s^2]
 
-% Parameters for the ABS State Machine
-rho_off    = 0.9;  % [-]   Scaling factor for the controller braking torque to
-                   %       turn OFF the ABS
-rho_on     = 1.1; % [-]   Scaling factor for the controller braking torque to
-                   %       turn ON the ABS
-rho        = 0.9; % [-]   Scaling factor for the low pass filter braking torque
-lambda1_th = 0.2;  % [-]   Right side of the longitudinal slip activation 
-                   %       interval
-lambda2_th = 0.1;  % [-]   Left side of the longitudinal slip activation 
-                   %       interval
-Tb_dot_max = k;    % [Nm]  Maximum braking torque rate
+% Select violation of condition for the existence of the limit cycle:
+%  - violate_condition = 1 -> violate no condition;
+%  - violate_condition = 2 -> violate condition 1;
+%  - violate_condition = 3 -> violate condition 2;
+%  - violate_condition = 4 -> violate condition 3.
+%
+violate_condition = 1;
+
+switch violate_condition
+    case 1
+        lambda_min = 0.08;
+        lambda_max = 0.25;
+        Tb_min     = 1000;
+        Tb_max     = 1400;
+    case 2
+        lambda_min = 0.08;
+        lambda_max = 0.25;
+        Tb_min     = 1000;
+        Tb_max     = 1150;
+    case 3
+        lambda_min = 0.08;
+        lambda_max = 0.25;
+        Tb_min     = 1250;
+        Tb_max     = 1400;
+    case 4
+        lambda_min = 0.08;
+        lambda_max = 0.25;
+        Tb_min     = 1150;
+        Tb_max     = 1400;
+end
+
 v_on       = 2.5;  % [m/s] Threshold to turn ON the ABS in high speed or low
                    %       speed mode
-hv         = 0.3;  % [m/s] Threshold to switch between high speed OFF and low 
-                   %       speed OFF
-v_stop     = 0.1;  % [m/s] Threshold to turn the ABS OFF in the low speed mode
+hv         = 0.5;  % [m/s] Threshold to switch between high speed OFF and low 
 
 %-------------------------------------------------------------------------------
 %% Plot the friction coefficients at different road conditions
@@ -102,7 +117,7 @@ pause( 1 ); % otherwise MATLAB overwrites this figure sometimes
 
 % Simulation parameters
 t0         = 0;           % [s] Initial simulation time
-tf         = 4;           % [s] Final simulation time
+tf         = 4;         % [s] Final simulation time
 dt         = 1e-3;        % [s] Time interval
 time       = (t0:dt:tf)'; % [s] Time vector
 
@@ -111,7 +126,7 @@ time       = (t0:dt:tf)'; % [s] Time vector
 %  - manoeuvre_type = 2 -> piecewise braking;
 %  - manoeuvre_type = 3 -> piecewise braking and hold at lower than max value.
 %
-manoeuvre_type = 3;
+manoeuvre_type = 2;
 rise_time_tb   = Tb_max/k; % time needed to go from 0 to Tb_max
 
 switch manoeuvre_type
@@ -166,7 +181,7 @@ switch manoeuvre_type
 end
 
 % Run simulation
-sim( 'ABS_contDyn_model' );
+sim( 'ABS_discDyn_model' );
 
 % Extract simulation time
 simTime = ABS.v.Time;
@@ -371,4 +386,4 @@ rectangle( 'Position', [ x_noABS(i) - v_length / 2, ...
                          30 - width / 2, v_length, width ], ...
            'Curvature', [ 0.2, 0.9 ], 'FaceColor', 'blue' );
 
-%% No more cool plots?
+%% Wait, is it over already?
