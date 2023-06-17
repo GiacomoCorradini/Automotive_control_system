@@ -16,6 +16,7 @@ classdef (StrictDefaults)setControlTargets < matlab.System
         % Initialize a clothoid list for the vehicle route 
         vehRoute = ClothoidList();
         length_vehRoute = 0;
+        performance = 0;
     end
 
     %% Methods
@@ -32,7 +33,7 @@ classdef (StrictDefaults)setControlTargets < matlab.System
     end
 
     %% stepImpl - called at each time step
-    function [targetPoint_latControl,speed_req,road_condition,endOfCircuit] = stepImpl(obj,vehPose,req_speed)
+    function [targetPoint_latControl,speed_req,road_condition,performance,endOfCircuit] = stepImpl(obj,vehPose,u,req_speed)
         x_vehCoM = vehPose(1);  % Current vehicle CoM x coord [m]
         y_vehCoM = vehPose(2);  % Current vehicle CoM y coord [m]
         theta_vehCoM = vehPose(3);  % Current vehicle attitude [rad]
@@ -68,13 +69,19 @@ classdef (StrictDefaults)setControlTargets < matlab.System
             case 5
                 x_F = x_vehCoM + obj.previewPoint_lookAhead*cos(theta_vehCoM);
                 y_F = y_vehCoM + obj.previewPoint_lookAhead*sin(theta_vehCoM);
-                [x_closest,y_closest,s_closest,~,~,~] = obj.vehRoute.closestPoint(x_F,y_F);
+                [x_closest,y_closest,s_closest,n_closest,~,~] = obj.vehRoute.closestPoint(x_F,y_F);
                 [~,~,theta_closest,curv_closest] = obj.vehRoute.evaluate(s_closest);
                 ep = sqrt((x_F-x_closest)^2 + (y_F-y_closest)^2);
-                targetPoint_latControl = [-ep*sign(atan2((y_F-y_closest),(x_F-x_closest))),0,theta_closest-theta_vehCoM,0];
+                targetPoint_latControl = [-ep*sign(n_closest),0,theta_closest-theta_vehCoM,0];
         end
 
-        
+        % Evalueta performance
+        [~,~,~,distance,~,~] = obj.vehRoute.closestPoint(x_vehCoM,y_vehCoM);
+        if abs(distance) < 4
+            obj.performance = obj.performance + 1/(1 + distance^2) + u;
+        end
+        performance = obj.performance/500;
+
         % desired vehicle speed [m/s]
         speed_req = req_speed/3.6;  
 %         if (x_vehCoM>=obj.x_parkLot && y_vehCoM>obj.y_lowBound_parkLot && y_vehCoM<obj.y_uppBound_parkLot)   % (s_closest >= obj.vehRoute.length-10)
@@ -85,32 +92,36 @@ classdef (StrictDefaults)setControlTargets < matlab.System
 %         end
     end
 
-    function [sz_1,sz_2,sz_3,sz_4] = getOutputSizeImpl(~) 
+    function [sz_1,sz_2,sz_3,sz_4,sz_5] = getOutputSizeImpl(~) 
         sz_1 = [1 4];
         sz_2 = [1];
         sz_3 = [1 4];
         sz_4 = [1];
+        sz_5 = [1];
     end
 
-    function [fz1,fz2,fz3,fz4] = isOutputFixedSizeImpl(~)
+    function [fz1,fz2,fz3,fz4,fz5] = isOutputFixedSizeImpl(~)
         fz1 = true;
         fz2 = true;
         fz3 = true;
         fz4 = true;
+        fz5 = true;
     end
 
-    function [dt1,dt2,dt3,dt4] = getOutputDataTypeImpl(~)
+    function [dt1,dt2,dt3,dt4,dt5] = getOutputDataTypeImpl(~)
         dt1 = 'double';
         dt2 = 'double';
         dt3 = 'double';
         dt4 = 'double';
+        dt5 = 'double';
     end
 
-    function [cp1,cp2,cp3,cp4] = isOutputComplexImpl(~)
+    function [cp1,cp2,cp3,cp4,cp5] = isOutputComplexImpl(~)
         cp1 = false;
         cp2 = false;
         cp3 = false;
         cp4 = false;
+        cp5 = false;
     end
         
     end

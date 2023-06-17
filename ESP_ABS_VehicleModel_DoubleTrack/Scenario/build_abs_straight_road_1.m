@@ -1,4 +1,4 @@
-function build_abs_straight_road_2()
+function build_abs_straight_road_1()
 
     % ----------------------------------
     %% Define the layout of the straight line scenario
@@ -55,7 +55,8 @@ function build_abs_straight_road_2()
     path.x_right_sampled = x_right_path_sample;
     path.y_right_sampled = y_right_path_sample;
     % Ground 
-    path.road_condition = [1,1,1,1] * 0.7 / 0.9; %wet asphalt
+    path.road_condition = [1,1,1,1];
+    
     % Simulation length
     times.t0        = 0;     % [s]  <--- starting time
     times.step_size = 1e-4; % [s]  <--- discrete solver step
@@ -63,6 +64,8 @@ function build_abs_straight_road_2()
     
     % Initial speed
     vehicle_control.max_speed = 120;
+
+    % Long control
 
     % Direct control
     vehicle_control.low_level_control = 0;
@@ -76,6 +79,11 @@ function build_abs_straight_road_2()
     % Output value of the input signal at the corresponding time
     vehicle_control.req_speed = [vehicle_control.max_speed, vehicle_control.max_speed,  vehicle_control.max_speed, vehicle_control.max_speed];
     
-    save('./Scenario/abs_straight_road_2','path','times','vehicle_control')
+    % Lat control
+    vehicle_control.low_level_control_steer = 1;
+    vehicle_control.time_delta   = [0, times.tf];
+    vehicle_control.req_delta = [0, 0];
+
+    save('./Scenario/abs_straight_road_1','path','times','vehicle_control')
     
 end

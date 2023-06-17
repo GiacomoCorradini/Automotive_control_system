@@ -20,15 +20,17 @@ addpath( genpath( 'Longit_Controller' ) );
 addpath( genpath( 'Lateral_Controllers' ) );
 addpath( genpath( 'Scenario' ) );
 addpath( genpath( 'Utilities' ) );
-%addpath( genpath( 'Clothoids') );
+addpath( genpath( 'Figures' ) );
+% addpath( 'Clothoids/matlab' );
 
 % --------------------
 %% Open Simulink model
 % --------------------
+model_name = ['Vehicle_Model'];
 
 % Check if the Simulink model is already opened. Otherwise open it
 openModels = find_system( 'SearchDepth', 0 );
-if ( isempty( find( strcmp( openModels, 'Vehicle_Model_Track_contABS' ), 1 ) ) )
-    load_system( 'Vehicle_Model_Track_contABS.slx' );
-    open_system( 'Vehicle_Model_Track_contABS' );
+if ( isempty( find( strcmp( openModels, model_name ), 1 ) ) )
+    load_system( model_name);
+    open_system( model_name );
 end

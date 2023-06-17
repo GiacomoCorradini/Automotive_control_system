@@ -1,21 +1,50 @@
-function build_abs_straight_road_3()
+function build_esp_s_road_1()
 
     % ----------------------------------
-    %% Define the layout of the straight line scenario
+    %% Define the layout of the double lane change scenario
     % ----------------------------------
-   
+    road_width = 6;
+
     % Starting point 
     x_path = 0;
     y_path = 0;
     theta_path = 0;
     
     % ------------------
-    % Straight line
+    % Initial straight line
     % ------------------
-    length_initial_straight = 120;
+    length_initial_straight = 50;
     x_path = [x_path; length_initial_straight];
     y_path = [y_path; 0];
     theta_path = [theta_path; 0];
+    
+    % ------------------
+    % Curve path
+    % ------------------
+    x_path = [x_path; x_path(end)+50];
+    y_path = [y_path; y_path(end)+30];
+    theta_path = [theta_path; theta_path(end)+pi/2];
+
+    % ------------------
+    % 2 Curve line
+    % ------------------
+    x_path = [x_path; x_path(end)+50];
+    y_path = [y_path; y_path(end)];
+    theta_path = [theta_path; theta_path(end)-pi];
+
+    % ------------------
+    % straight path
+    % ------------------
+    x_path = [x_path; x_path(end)-50];
+    y_path = [y_path; y_path(end)-100];
+    theta_path = [theta_path; theta_path(end)];
+    
+    % ------------------
+    % Final straight line
+    % ------------------
+    x_path = [x_path; x_path(end)+25];
+    y_path = [y_path; y_path(end)-25];
+    theta_path = [theta_path; theta_path(end)+pi/2];
     
     % ------------------
     %% Plot the scenario 
@@ -28,15 +57,15 @@ function build_abs_straight_road_3()
     % Evaluate the points belonging to the path (clothoid list)
     curv_absc_sample = 0:0.1:S_clothoid.length;
     [x_path_sample,y_path_sample,~,~] = S_clothoid.evaluate(curv_absc_sample);
-    [x_left_path_sample,y_left_path_sample,~,~] = S_clothoid.evaluate(curv_absc_sample, 3);
-    [x_right_path_sample,y_right_path_sample,~,~] = S_clothoid.evaluate(curv_absc_sample, -3);
+    [x_left_path_sample,y_left_path_sample,~,~] = S_clothoid.evaluate(curv_absc_sample, road_width/2);
+    [x_right_path_sample,y_right_path_sample,~,~] = S_clothoid.evaluate(curv_absc_sample, -road_width/2);
     
     figure('Name','Scenario','NumberTitle','off'), clf  
     hold on
     axis equal
-    S_clothoid.plot_offs(3,numel(curv_absc_sample));
+    S_clothoid.plot_offs(road_width/2,numel(curv_absc_sample));
     S_clothoid.plot;
-    S_clothoid.plot_offs(-3,numel(curv_absc_sample));
+    S_clothoid.plot_offs(-road_width/2,numel(curv_absc_sample));
     grid on
     xlabel('x [m]')
     ylabel('y [m]')
@@ -55,18 +84,18 @@ function build_abs_straight_road_3()
     path.x_right_sampled = x_right_path_sample;
     path.y_right_sampled = y_right_path_sample;
     % Ground 
-    path.road_condition = [1,0.1/0.9,1,0.1/0.9];
+    path.road_condition = [1,1,1,1]; %rr,rl,fr,fl
     
     % Simulation length
     times.t0        = 0;     % [s]  <--- starting time
     times.step_size = 1e-4; % [s]  <--- discrete solver step
-    times.tf        = 15;    % [s]  <--- stop simulation time
+    times.tf        = 20;    % [s]  <--- stop simulation time
     
     % Initial speed
     vehicle_control.max_speed = 90;
-
+    
     % Direct control
-    vehicle_control.low_level_control = 0;
+    vehicle_control.low_level_control = 1;
     vehicle_control.time_pedal   = [0, 0.8, 0.8 + 0.1, times.tf];
     vehicle_control.req_pedal = [0.3, 0.3,  -1, -1];
     
@@ -77,6 +106,11 @@ function build_abs_straight_road_3()
     % Output value of the input signal at the corresponding time
     vehicle_control.req_speed = [vehicle_control.max_speed, vehicle_control.max_speed,  vehicle_control.max_speed, vehicle_control.max_speed];
     
-    save('./Scenario/abs_straight_road_3','path','times','vehicle_control')
+    % Lat control
+    vehicle_control.low_level_control_steer = 1;
+    vehicle_control.time_delta   = [0, times.tf];
+    vehicle_control.req_delta = [0, 0];
+    save('./Scenario/esp_road_1','path','times','vehicle_control')
+    
     
 end
