@@ -18,7 +18,7 @@ understeer_vehicle = [
 % Create the state space here
 [A,B,C,D] = state_space(understeer_vehicle,10);
 
-%%
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %
 %  DESIGN 2
 %
@@ -90,7 +90,7 @@ hold on;
 bode(sysS,'r');
 legend('T(s)','S(s)')
 
-%%
+
 % ----------------------------------------------- %
 %  Test performance on the nonlinear model 
 % ----------------------------------------------- %

@@ -10,14 +10,14 @@ M = understeer_vehicle(7);
 IG = understeer_vehicle(8);
 
 A11 = -(KLf+KLr)/(M*VG);
-A12 = -1 + (KLr*Lr-KLf*Lf)/(M*VG);
+A12 = -1 + (KLr*Lr-KLf*Lf)/(M*VG^2);
 A21 = (KLr*Lr-KLf*Lf)/(IG);
 A22 = (KLf*Lf^2+KLr*Lr^2)/(IG*VG);
 
 B1 = KLf/(M*VG);
 B2 = (KLf*Lf)/IG;
 
-A = [A11,A12;A21,A22];
+A = [A11,A12;A21,-A22];
 B = [B1;B2];
 C = [0, 1];
 D = 0;
