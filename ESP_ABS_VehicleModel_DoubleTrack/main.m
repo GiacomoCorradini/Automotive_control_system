@@ -112,7 +112,7 @@ Tf = scenario_data.times.tf/2;         % stop time of the simulation
 
 
 % Desired vehicle speed
-max_speed = 50; % scenario_data.vehicle_control.max_speed;
+max_speed = 70; % scenario_data.vehicle_control.max_speed;
 
 % ----------------------------
 %% Define initial conditions for the simulation

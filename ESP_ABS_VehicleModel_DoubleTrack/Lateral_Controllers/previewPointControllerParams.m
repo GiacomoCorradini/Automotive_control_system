@@ -5,9 +5,9 @@ function previewPointParams = previewPointControllerParams()
     % ----------------------------------------------------------------
     
     % ke error to position
-    previewPointParams.ke = 0.5; 
+    previewPointParams.ke = 2; 
     % kp error to angle
-    previewPointParams.kp = 1.2; 
+    previewPointParams.kp = 2; 
     % lookhead
     previewPointParams.lookAhead = 10;
 
