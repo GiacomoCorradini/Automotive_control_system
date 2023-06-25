@@ -1,4 +1,4 @@
-function build_esp_s_road_1()
+function build_esp_road_1()
 
     % ----------------------------------
     %% Define the layout of the double lane change scenario
@@ -92,7 +92,7 @@ function build_esp_s_road_1()
     times.tf        = 20;    % [s]  <--- stop simulation time
     
     % Initial speed
-    vehicle_control.max_speed = 90;
+    vehicle_control.max_speed = 80;
     
     % Direct control
     vehicle_control.low_level_control = 1;

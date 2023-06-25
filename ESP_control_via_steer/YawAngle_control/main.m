@@ -16,7 +16,7 @@ understeer_vehicle = [
     1200]; % IG  = yaw inertia
 
 % Create the state space here
-% [A,B,C,D] =
+[A,B,C,D] = state_space(understeer_vehicle,10);
 
 % QUESTION: What is the controlled var: psi_dot or psi ??
 
@@ -25,7 +25,7 @@ understeer_vehicle = [
 %
 %  Assumption: controlled var = psi
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %
-sys = 1; % use ss function or/and zpk
+sys = ss(A,B,C,D); % use ss function or/and zpk
 
 %%
 
@@ -59,14 +59,23 @@ wgc = 30;
 % Design your PD
 
 % CODE HERE
-PD = tf(1);
+s = tf([1],[1 0]);
+sysL0 = sys*s;
+[mag,phase] = bode(sysL0,wgc);
 
+DK = 1/mag;
+DP = PM - 180 - phase;
+
+K_D = DK*sind(DP)/wgc;
+K_P = DK*cosd(DP);
+
+PD = tf([K_D K_P],1)*sysL0;
 %%
 % ----------------------------------------------- %
 %  Design check on the nominal model
 % ----------------------------------------------- %
 
-sysL = PD*sysP; % loop tf
+sysL = PD*sysL0; % loop tf
 sysT = feedback(sysL,1); % complementary sensitivity tf
 sysS = feedback(1,sysL); % sensitivity tf
 %

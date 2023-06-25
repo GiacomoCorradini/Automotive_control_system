@@ -83,7 +83,6 @@ Tb_dot_max = 5e3;
 v_on       = 2.5;
 hv         = 0.2;
 v_stop     = 0.1;
-Tb_max     = 1000;
 
 % ----------------------------
 %% Load road scenario
@@ -96,10 +95,10 @@ Tb_max     = 1000;
 %scenario_name = 'esp_straight_road_2';  % Wet asphalt on left wheels no lateral control -> Objective keep the vehicle in the road while braking before 84 m
 %scenario_name = 'esp_s_road_1';         % Dry asphalt with lateral control -> Objective keep the vehicle in the road
 scenario_name = 'esp_road_1';            % Dry asphalt with lateral control -> Objective keep the vehicle in the road reach the end of the road (reach at least 1200 of performance)
-% scenario_name = 'kin_obs_road_1';       % Test Kinematic Observer
+%scenario_name = 'kin_obs_road_1';       % Test Kinematic Observer
 
 
-scenario_data         = load(strcat('./Scenario/', scenario_name , '.mat'));
+scenario_data       = load(strcat('./Scenario/', scenario_name , '.mat'));
 road_data         = [scenario_data.path.x, scenario_data.path.y, scenario_data.path.theta];
 road_data_sampled = [scenario_data.path.x_sampled', scenario_data.path.y_sampled'];
 road_condition = scenario_data.path.road_condition;
@@ -108,18 +107,18 @@ road_condition = scenario_data.path.road_condition;
 % Define initial conditions for the simulation
 Ts = scenario_data.times.step_size;  % integration step for the simulation (fixed step)
 T0 = scenario_data.times.t0;         % starting time of the simulation
-Tf = scenario_data.times.tf/2;         % stop time of the simulation
+Tf = scenario_data.times.tf;         % stop time of the simulation
 
 
 % Desired vehicle speed
-max_speed = 70; % scenario_data.vehicle_control.max_speed;
+max_speed = scenario_data.vehicle_control.max_speed;
 
 % ----------------------------
 %% Define initial conditions for the simulation
 % ----------------------------
 X0 = loadInitialConditions(scenario_data.vehicle_control.max_speed/3.6);
 
-% ----------------------------z
+% ----------------------------
 %% Define graphical interface settings
 % ----------------------------
 % Set this flag to 1 in order to enable online plots during the simulation
@@ -159,5 +158,6 @@ fprintf( 'The total simulation time was %.2f seconds\n', ...
 %% Post-Processing
 %------------------------------------------------------------------------------
 
-dataAnalysis( model_sim, vehicle_data, Ts, scenario_name );
+dataAnalysis(model_sim, vehicle_data, Ts, scenario_name);
+
 

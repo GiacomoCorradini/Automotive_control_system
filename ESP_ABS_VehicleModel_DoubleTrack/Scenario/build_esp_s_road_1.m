@@ -86,7 +86,7 @@ function build_esp_s_road_1()
     path.x_right_sampled = x_right_path_sample;
     path.y_right_sampled = y_right_path_sample;
     % Ground 
-    path.road_condition = [1,1,1,1]; %rr,rl,fr,fl
+    path.road_condition = [0.85,0.85,0.85,0.85]; %rr,rl,fr,fl
     
     % Simulation length
     times.t0        = 0;     % [s]  <--- starting time
@@ -94,7 +94,7 @@ function build_esp_s_road_1()
     times.tf        = 7;    % [s]  <--- stop simulation time
     
     % Initial speed
-    vehicle_control.max_speed = 90;
+    vehicle_control.max_speed = 80;
     
     % Direct control
     vehicle_control.low_level_control = 1;

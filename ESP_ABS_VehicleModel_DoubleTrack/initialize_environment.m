@@ -21,7 +21,6 @@ addpath( genpath( 'Lateral_Controllers' ) );
 addpath( genpath( 'Scenario' ) );
 addpath( genpath( 'Utilities' ) );
 addpath( genpath( 'Figures' ) );
-% addpath( 'Clothoids/matlab' );
 
 % --------------------
 %% Open Simulink model

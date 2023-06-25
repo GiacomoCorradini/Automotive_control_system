@@ -1,6 +1,6 @@
 function dataAnalysis(model_sim,vehicle_data,Ts,scenario_name)
 
-% export images
+% % export images
 % path = 'Plots/imageNOESP';
 % figure_width_l = 800;
 % figure_heigth_l = figure_width_l/1.5;
@@ -53,12 +53,13 @@ y_CoM      = model_sim.states.y.data;
 psi        = model_sim.states.psi.data;
 u          = model_sim.states.u.data;
 v          = model_sim.states.v.data;
-Omega_      = model_sim.states.Omega.data(1,1,:);
+Omega      = model_sim.states.Omega.data;
+Omega      = permute(Omega,[3 2 1]);
 Fz_rr      = model_sim.states.Fz_rr.data;
 Fz_rl      = model_sim.states.Fz_rl.data;
 Fz_fr      = model_sim.states.Fz_fr.data;
 Fz_fl      = model_sim.states.Fz_fl.data;
-delta_      = model_sim.states.delta.data(1,1,:);
+delta      = model_sim.states.delta.data;
 omega_rr   = model_sim.states.omega_rr.data;
 omega_rl   = model_sim.states.omega_rl.data;
 omega_fr   = model_sim.states.omega_fr.data;
@@ -98,26 +99,18 @@ gamma_fl   = model_sim.extra_params.gamma_fl.data;
 delta_fr   = model_sim.extra_params.delta_fr.data;
 delta_fl   = model_sim.extra_params.delta_fl.data;
 
-for i = 1:length(Omega_)
-    Omega(i) = Omega_(:,:,i);
-    delta(i) = delta_(:,:,i);
-end
-
-Omega = Omega';
-delta = delta';
-
 % -----------------
 % Longitudinal Velocity estimator
 % -----------------
-% u_est           = model_sim.uest.data;
-% u_est_selector  = model_sim.u_est_selector.data;
+%u_est           = model_sim.uest.data;
+%u_est_selector  = model_sim.u_est_selector.data;
 
 % -----------------
 % Accelerations
 % -----------------
 % Derivatives of u, v [m/s^2]
-dot_u = diff(u)/Ts;
-dot_v = diff(v)/Ts;
+dot_u = diff(u)./Ts;
+dot_v = diff(v)./Ts;
 % Total longitudinal and lateral accelerations
 Ax = dot_u(1:end) - Omega(2:end).*v(2:end);
 Ay = dot_v(1:end) + Omega(2:end).*u(2:end);
@@ -436,8 +429,8 @@ xlim([0 time_sim(end)])
 clear ax
 
 % -------------------------------
-% Plot G-G diagram from simulation data
-%-------------------------------
+%% Plot G-G diagram from simulation data
+% -------------------------------
 f = figure('Name','G-G plot','NumberTitle','off');
 % f.Position = [figure_pos_x_l figure_pos_y_l figure_width_l figure_heigth_l];
 axis equal
@@ -450,9 +443,9 @@ title('G-G diagram from simulation data','FontSize',18)
 grid on
 % hgexport(f, sprintf('%s/GGDiagram.eps', path))
 
-%-------------------------------
-% Plot vehicle velocity
-%-------------------------------
+% -------------------------------
+%% Plot vehicle velocity
+% -------------------------------
 figure('Name','Wheel rates & vehicle vel','NumberTitle','off'), clf
 % --- vel --- %
 hold on
@@ -466,10 +459,10 @@ title('Vehicle velocity [m/s]')
 legend('$u$ [m/s]','$\omega_{rr}*Rr$ [m/s]','$\omega_{rl}*Rr$ [m/s]','$\omega_{fr}*Rf$ [m/s]','$\omega_{fl}*Rf$ [m/s]')
 xlim([0 time_sim(end)])
 
-% %-------------------------------
-% % Plot estimate vehicle velocity
-% %-------------------------------
-% 
+% -------------------------------
+%% Plot estimate vehicle velocity
+% -------------------------------
+
 % figure( 'Name', 'Longitudinal velocity', 'NumberTitle', 'off' );
 % % f.Position = [figure_pos_x_l, figure_pos_y_l, figure_width_l, figure_heigth_l];
 % plot( time_sim, u * 3.6, 'LineWidth', 1.29 );
